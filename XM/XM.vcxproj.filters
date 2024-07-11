@@ -26,5 +26,14 @@
     <ClInclude Include="ProductProvider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IProductStorage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StorageFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

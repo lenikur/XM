@@ -1,4 +1,4 @@
-#include "pch.h"
+#include <gmock/gmock.h>
 #include "..\XM\lru_cache.h"
 
 TEST(LRUTests, Insertion)
