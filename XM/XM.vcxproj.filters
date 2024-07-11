@@ -23,5 +23,8 @@
     <ClInclude Include="lru_cache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ProductProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,7 +3,7 @@
 
 #include <unordered_map>
 #include <list>
-
+#include <optional>
 
 template<typename Key, typename Value>
 class LRUCache
@@ -28,17 +28,17 @@ public:
 		insert(std::forward<_Key>(key), std::forward<_Value>(value));
 	}
 
-	// think about smart ptr
-	const Value* GetItem(const Key& key) const
+	// The return result is valid until next Insert call
+	std::optional<std::reference_wrapper<Value>> GetItem(const Key& key) const
 	{
 		const auto it = _hashTable.find(key);
 		if (_hashTable.end() == it)
 		{
-			return nullptr;
+			return std::nullopt;
 		}
 
 		_cache.splice(_cache.begin(), _cache, it->second);
-		return &(_cache.front().second);
+		return _cache.front().second;
 	}
 
 private:
