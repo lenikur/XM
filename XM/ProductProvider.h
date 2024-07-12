@@ -1,7 +1,7 @@
 #pragma once
 
 #include <shared_mutex>
-
+#include "logging.h"
 #include "IProductStorage.h"
 #include "lru_cache.h"
 
@@ -26,6 +26,7 @@ public:
 			const auto product = _cache.GetItem(id);
 			if (product.has_value())
 			{
+				spdlog::info("item {} from cache: {}", id, static_cast<const Product&>(*product));
 				return product;
 			}
 		}
@@ -33,8 +34,11 @@ public:
 		auto product = _storage->GetProduct(id);
 		if (!product.has_value())
 		{
+			spdlog::info("no item {} in DB", id);
 			return std::nullopt;
 		}
+
+		spdlog::info("item {} from DB: {}", id, *product);
 
 		std::scoped_lock lock{_mutex};
 		
@@ -42,6 +46,7 @@ public:
 		const auto cachedProduct = _cache.GetItem(id);
 		if (cachedProduct.has_value())
 		{
+			spdlog::info("item {} placed to cache by another thread: {}", id, static_cast<const Product&>(*cachedProduct));
 			return cachedProduct;
 		}
 
