@@ -5,13 +5,19 @@
 #include "IProductStorage.h"
 #include "lru_cache.h"
 
+// Wrapper for DB-related IProductStorage implementation
 class ProductProvider : public IProductStorage
 {
 public:
 	explicit ProductProvider(std::shared_ptr<IProductStorage> storage, size_t cacheSize)
 		: _cache{ cacheSize }
 		, _storage{ std::move(storage) }
-	{}
+	{
+		if (!_storage)
+		{
+			throw std::invalid_argument("a storage can't be null");
+		}
+	}
 
 	std::optional<Product> GetProduct(Id id) const override
 	{
@@ -31,6 +37,14 @@ public:
 		}
 
 		std::scoped_lock lock{_mutex};
+		
+		// let's check the cache again, as another thread could insert it to the cache while we worked out of lock
+		const auto cachedProduct = _cache.GetItem(id);
+		if (cachedProduct.has_value())
+		{
+			return cachedProduct;
+		}
+
 		return _cache.Insert(product->id, std::move(*product));
 	}
 

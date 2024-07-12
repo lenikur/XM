@@ -9,7 +9,7 @@ struct ProductStorageMock : IProductStorage
 	MOCK_METHOD(size_t, GetProductCountByCategory, (Category category), (const, override));
 };
 
-TEST(ProductProviderTests, CacheTest)
+TEST(ProductProviderTests, Caching)
 {
 	auto storage = std::make_shared<ProductStorageMock>();
 	EXPECT_CALL(*storage, GetProduct(10)).Times(2).WillRepeatedly(Return(Product{ .id = 10 }));
@@ -26,7 +26,7 @@ TEST(ProductProviderTests, CacheTest)
 	EXPECT_TRUE(provider.GetProduct(10)->id == 10);
 }
 
-TEST(ProductProviderTests, NoCacheUsingTest)
+TEST(ProductProviderTests, NoCacheUsing)
 {
 	auto storage = std::make_shared<ProductStorageMock>();
 	EXPECT_CALL(*storage, GetProductCountByCategory(10)).Times(2).WillOnce(Return(5)).WillOnce(Return(7));
@@ -35,4 +35,10 @@ TEST(ProductProviderTests, NoCacheUsingTest)
 
 	EXPECT_TRUE(provider.GetProductCountByCategory(10) == 5);
 	EXPECT_TRUE(provider.GetProductCountByCategory(10) == 7);
+}
+
+TEST(ProductProviderTests, NullStorage)
+{
+	using IProductStoragePtr = std::shared_ptr<IProductStorage>;
+	EXPECT_THROW(ProductProvider provider(IProductStoragePtr(), 3), std::invalid_argument);
 }

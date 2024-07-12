@@ -31,7 +31,7 @@ private:
 
 int main()
 {
-	StorageFactory factory;
+	FakeStorageFactory factory;
 	auto storage = factory.CreateProductStorage();
 
 	boost::asio::thread_pool pool{ 3 };

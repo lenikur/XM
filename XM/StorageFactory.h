@@ -31,7 +31,7 @@ public:
 	}
 };
 
-class StorageFactory : public IStorageFactory
+class FakeStorageFactory : public IStorageFactory
 {
 public:
 	std::shared_ptr<IProductStorage> CreateProductStorage() const override

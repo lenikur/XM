@@ -4,8 +4,9 @@
 #include <unordered_map>
 #include <list>
 #include <optional>
+#include <exception>
 
-template<typename Key, typename Value>
+template<typename Key, typename Value, typename Hasher = std::hash<Key>, typename KeyEq = std::equal_to<Key>>
 class LRUCache
 {
 	using Cache = std::list<std::pair<Key, Value>>;
@@ -13,6 +14,10 @@ public:
 	explicit LRUCache(size_t capacity)
 		: _capacity{ capacity }
 	{
+		if (_capacity == 0)
+		{
+			throw std::invalid_argument{ "capacity should not be 0" };
+		}
 	}
 
 	using ValueRefOpt = std::optional<std::reference_wrapper<const Value>>;
@@ -43,11 +48,22 @@ public:
 		return _cache.front().second;
 	}
 
+	void RemoveItem(const Key& key)
+	{
+		const auto it = _hashTable.find(key);
+		if (_hashTable.end() == it)
+		{
+			return;
+		}
+
+		_cache.erase(it->second);
+		_hashTable.erase(it);
+	}
+
 private:
 	template<typename _Key, typename _Value>
 	ValueRefOpt insert(_Key&& key, _Value&& value)
 	{
-		// think about exceptions
 		if (_cache.size() + 1 > _capacity)
 		{
 			_hashTable.erase(_cache.back().first);
@@ -60,10 +76,8 @@ private:
 		return _cache.front().second;
 	}
 
-
-
 private:
 	const size_t _capacity;
 	mutable Cache _cache;
-	std::unordered_map<Key, typename Cache::const_iterator> _hashTable;
+	std::unordered_map<Key, typename Cache::const_iterator, Hasher, KeyEq> _hashTable;
 };
